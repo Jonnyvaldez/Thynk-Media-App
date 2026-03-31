@@ -152,7 +152,60 @@ async function renderOverview(client, container) {
         ${client.start_date ? `<div style="font-size:11px;color:var(--muted);margin-top:4px">Started ${formatDate(client.start_date)}</div>` : ''}
       </div>
     </div>
+
+    <div id="edit-client-form" class="inline-form" style="margin-top:16px">
+      <div class="form-row">
+        <div style="flex:1">
+          <label class="form-label">Status</label>
+          <select class="form-input" id="edit-status">
+            <option value="active" ${client.status === 'active' ? 'selected' : ''}>Active (retainer)</option>
+            <option value="performance_phase" ${client.status === 'performance_phase' ? 'selected' : ''}>Performance phase</option>
+            <option value="inactive" ${client.status === 'inactive' ? 'selected' : ''}>Inactive</option>
+          </select>
+        </div>
+        <div style="flex:1">
+          <label class="form-label">Deal type</label>
+          <select class="form-input" id="edit-deal">
+            <option value="retainer" ${client.deal_type === 'retainer' ? 'selected' : ''}>Straight retainer</option>
+            <option value="performance" ${client.deal_type === 'performance' ? 'selected' : ''}>Performance-based</option>
+            <option value="flat_retainer" ${client.deal_type === 'flat_retainer' ? 'selected' : ''}>Flat retainer</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div style="flex:1">
+          <label class="form-label">Monthly value ($)</label>
+          <input class="form-input" id="edit-value" type="number" value="${client.monthly_value || ''}">
+        </div>
+        <div style="flex:1">
+          <label class="form-label">Channel</label>
+          <input class="form-input" id="edit-channel" value="${client.channel || ''}">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-sm" onclick="document.getElementById('edit-client-form').classList.remove('open')">Cancel</button>
+        <button class="btn btn-primary btn-sm" id="save-edit-btn">Save Changes</button>
+      </div>
+    </div>
+
+    <div style="margin-top:14px">
+      <button class="btn btn-sm" id="edit-client-btn">Edit client</button>
+    </div>
   `
+
+  document.getElementById('edit-client-btn').addEventListener('click', () => {
+    document.getElementById('edit-client-form').classList.toggle('open')
+  })
+
+  document.getElementById('save-edit-btn').addEventListener('click', async () => {
+    await updateClient(client.id, {
+      status: document.getElementById('edit-status').value,
+      deal_type: document.getElementById('edit-deal').value,
+      monthly_value: parseInt(document.getElementById('edit-value').value) || 0,
+      channel: document.getElementById('edit-channel').value.trim()
+    })
+    await renderClientDetail(client.id, 'overview')
+  })
 }
 
 async function renderTasks(clientId, container) {
