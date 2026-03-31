@@ -24,36 +24,84 @@
   <!-- Main app (hidden until logged in) -->
   <div id="app" class="hidden">
 
-    <!-- Top bar -->
-    <header class="topbar">
-      <span class="topbar-brand">THYNK MEDIA</span>
-      <button id="logout-btn" class="logout-btn">Sign out</button>
-    </header>
+    <!-- Sidebar (desktop only) -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-brand">THYNK MEDIA</span>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-tab nav-item" data-tab="today">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <span class="nav-label">Today</span>
+        </button>
+        <button class="nav-tab nav-item" data-tab="clients">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <span class="nav-label">Clients</span>
+        </button>
+        <button class="nav-tab nav-item" data-tab="pipeline">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
+          </svg>
+          <span class="nav-label">Pipeline</span>
+        </button>
+        <button class="nav-tab nav-item" data-tab="warroom">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+          </svg>
+          <span class="nav-label">War Room</span>
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="logout-btn-sidebar" class="sidebar-logout">Sign out</button>
+      </div>
+    </aside>
 
-    <!-- Tab content -->
-    <main id="tab-content"></main>
+    <!-- Main content wrapper -->
+    <div class="main-wrapper">
 
-    <!-- Bottom nav -->
-    <nav class="bottom-nav">
-      <button class="nav-tab" data-tab="today">
-        <span class="nav-icon">📋</span>
-        <span class="nav-label">TODAY</span>
-      </button>
-      <button class="nav-tab" data-tab="clients">
-        <span class="nav-icon">👥</span>
-        <span class="nav-label">CLIENTS</span>
-      </button>
-      <button class="nav-tab" data-tab="pipeline">
-        <span class="nav-icon">📈</span>
-        <span class="nav-label">PIPELINE</span>
-      </button>
-      <button class="nav-tab" data-tab="warroom">
-        <span class="nav-icon">⚔️</span>
-        <span class="nav-label">WAR ROOM</span>
-      </button>
-    </nav>
+      <!-- Top bar (mobile brand + always-visible logout) -->
+      <header class="topbar">
+        <span class="topbar-brand">THYNK MEDIA</span>
+        <button id="logout-btn" class="logout-btn">Sign out</button>
+      </header>
 
-  </div>
+      <!-- Tab content -->
+      <main id="tab-content"></main>
+
+      <!-- Bottom nav (mobile only) -->
+      <nav class="bottom-nav">
+        <button class="nav-tab" data-tab="today">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <span class="nav-label">TODAY</span>
+        </button>
+        <button class="nav-tab" data-tab="clients">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <span class="nav-label">CLIENTS</span>
+        </button>
+        <button class="nav-tab" data-tab="pipeline">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
+          </svg>
+          <span class="nav-label">PIPELINE</span>
+        </button>
+        <button class="nav-tab" data-tab="warroom">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+          </svg>
+          <span class="nav-label">WAR ROOM</span>
+        </button>
+      </nav>
+
+    </div><!-- .main-wrapper -->
+  </div><!-- #app -->
 
   <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

@@ -25,24 +25,24 @@ async function renderToday() {
     </div>
 
     ${urgentTasks.length > 0 ? `
-    <div class="section-label">🔴 Urgent</div>
+    <div class="section-label">Urgent</div>
     ${urgentTasks.map(t => taskRowHTML(t, 'urgent')).join('')}
     ` : ''}
 
     ${weekTasks.length > 0 ? `
-    <div class="section-label">🟡 This Week</div>
+    <div class="section-label">This Week</div>
     ${weekTasks.map(t => taskRowHTML(t, 'thisweek')).join('')}
     ` : ''}
 
     ${urgentTasks.length === 0 && weekTasks.length === 0 ? `
     <div class="empty-state" style="margin-top:40px">
-      <div style="font-size:32px;margin-bottom:8px">✓</div>
-      <div>All clear for today</div>
+      <div style="font-size:13px;color:var(--green);font-weight:600;margin-bottom:4px">All clear</div>
+      <div style="font-size:12px">No urgent or upcoming tasks</div>
     </div>
     ` : ''}
 
     ${payments.length > 0 ? `
-    <div class="section-label">💰 Payments Due</div>
+    <div class="section-label">Payments Due</div>
     ${payments.map(p => `
       <div class="card-inner" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
         <div>

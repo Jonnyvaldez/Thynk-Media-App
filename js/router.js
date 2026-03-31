@@ -13,7 +13,7 @@ async function navigate(hash) {
 
   const [tab, clientId, subtab] = hash.replace('#', '').split('/')
 
-  // Update active nav tab
+  // Update active state on all nav-tab elements (bottom nav + sidebar)
   document.querySelectorAll('.nav-tab').forEach(btn => {
     const btnTab = btn.dataset.tab
     btn.classList.toggle('active', btnTab === tab || (btnTab === 'clients' && tab === 'clients'))
@@ -32,9 +32,17 @@ window.addEventListener('hashchange', () => {
   navigate(location.hash || '#today')
 })
 
-// Wire up bottom nav
+// Wire up all nav-tab buttons (bottom nav + sidebar)
 document.querySelectorAll('.nav-tab').forEach(btn => {
   btn.addEventListener('click', () => {
     location.hash = '#' + btn.dataset.tab
   })
 })
+
+// Wire sidebar logout button
+const sidebarLogout = document.getElementById('logout-btn-sidebar')
+if (sidebarLogout) {
+  sidebarLogout.addEventListener('click', () => {
+    document.getElementById('logout-btn').click()
+  })
+}
