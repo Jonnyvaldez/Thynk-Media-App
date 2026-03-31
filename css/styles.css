@@ -315,11 +315,6 @@ body {
     max-width: 1000px;
   }
 
-  /* Stats row — 4 across on desktop */
-  .stats-row {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
   /* Client grid — 3 across on desktop */
   .client-grid {
     grid-template-columns: repeat(3, 1fr);
@@ -439,7 +434,7 @@ body {
 /* ─── STAT CARDS ─────────────────────────────────── */
 .stats-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 10px;
   margin-bottom: 20px;
 }

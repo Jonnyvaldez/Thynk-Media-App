@@ -172,23 +172,30 @@ function autoResize(el) {
   el.style.height = el.scrollHeight + 'px'
 }
 
+function localDateStr(d) {
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0')
+}
+
 function getMondayDate() {
   const today = new Date()
   const day = today.getDay()
-  const diff = today.getDate() - day + (day === 0 ? -6 : 1)
-  const monday = new Date(today.setDate(diff))
-  return monday.toISOString().split('T')[0]
+  const diff = day === 0 ? -6 : 1 - day
+  const monday = new Date(today)
+  monday.setDate(today.getDate() + diff)
+  return localDateStr(monday)
 }
 
 function getWeekDays() {
   const monday = new Date(getMondayDate() + 'T00:00:00')
-  const todayStr = new Date().toISOString().split('T')[0]
+  const todayStr = localDateStr(new Date())
   const dayNames = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
   const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
   return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(monday)
     d.setDate(monday.getDate() + i)
-    const dateStr = d.toISOString().split('T')[0]
+    const dateStr = localDateStr(d)
     return {
       short: dayNames[i],
       label: dayLabels[i],
