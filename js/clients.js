@@ -8,8 +8,55 @@ async function renderClients() {
   content.innerHTML = `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
       <div style="font-size:17px;font-weight:700">Clients</div>
-      <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">${active.length} active</div>
+      <button class="btn btn-sm btn-primary" id="add-client-btn">+ New client</button>
     </div>
+
+    <div id="add-client-form" class="inline-form" style="margin-bottom:14px">
+      <div class="form-group">
+        <label class="form-label">Name</label>
+        <input class="form-input" id="c-name" placeholder="e.g. Gerald Rojo">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Business type</label>
+        <input class="form-input" id="c-biz" placeholder="e.g. Personal Trainer · Forge Gym">
+      </div>
+      <div class="form-row">
+        <div style="flex:1">
+          <label class="form-label">Status</label>
+          <select class="form-input" id="c-status">
+            <option value="active">Active (retainer)</option>
+            <option value="performance_phase">Performance phase</option>
+          </select>
+        </div>
+        <div style="flex:1">
+          <label class="form-label">Deal type</label>
+          <select class="form-input" id="c-deal">
+            <option value="retainer">Straight retainer</option>
+            <option value="performance">Performance-based</option>
+            <option value="flat_retainer">Flat retainer</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div style="flex:1">
+          <label class="form-label">Monthly value ($)</label>
+          <input class="form-input" id="c-value" type="number" placeholder="0 if pending">
+        </div>
+        <div style="flex:1">
+          <label class="form-label">Channel</label>
+          <input class="form-input" id="c-channel" placeholder="e.g. Meta Ads">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Start date</label>
+        <input class="form-input" id="c-start" type="date">
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-sm" onclick="document.getElementById('add-client-form').classList.remove('open')">Cancel</button>
+        <button class="btn btn-primary btn-sm" id="save-client-btn">Add Client</button>
+      </div>
+    </div>
+
     <div class="client-grid">
       ${active.map(c => `
         <div class="client-card" onclick="location.hash='#clients/${c.id}'">
@@ -24,6 +71,25 @@ async function renderClients() {
       `).join('')}
     </div>
   `
+
+  document.getElementById('add-client-btn').addEventListener('click', () => {
+    document.getElementById('add-client-form').classList.toggle('open')
+  })
+
+  document.getElementById('save-client-btn').addEventListener('click', async () => {
+    const name = document.getElementById('c-name').value.trim()
+    if (!name) return
+    await addClient({
+      name,
+      business_type: document.getElementById('c-biz').value.trim(),
+      status: document.getElementById('c-status').value,
+      deal_type: document.getElementById('c-deal').value,
+      monthly_value: parseInt(document.getElementById('c-value').value) || 0,
+      channel: document.getElementById('c-channel').value.trim(),
+      start_date: document.getElementById('c-start').value || null
+    })
+    await renderClients()
+  })
 }
 
 async function renderClientDetail(clientId, subtab) {
