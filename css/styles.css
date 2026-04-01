@@ -733,3 +733,245 @@ textarea.form-input { resize: vertical; min-height: 100px; }
   padding-bottom: 16px;
   border-bottom: 1px solid var(--border);
 }
+
+/* ─── DAY CARDS (Week Ahead) ─────────────────────── */
+.day-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+.day-card-today {
+  background: #EFF6FF;
+  border: 2px solid var(--primary);
+}
+.day-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.day-card-name {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.05em;
+  font-family: var(--font-mono);
+}
+.day-card-today .day-card-name { color: #1D4ED8; }
+.day-card-date {
+  font-size: 10px;
+  color: var(--muted);
+  margin-left: 5px;
+}
+.day-card-today-pill {
+  font-size: 9px;
+  background: var(--primary);
+  color: #fff;
+  padding: 1px 6px;
+  border-radius: 10px;
+  margin-left: 7px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+.day-card-add {
+  background: none;
+  border: none;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0 2px;
+  font-weight: 300;
+  transition: color 0.15s;
+}
+.day-card-add:hover { color: var(--primary); }
+.day-card-today .day-card-add { color: var(--primary); }
+
+/* ─── EVENT CHIPS ────────────────────────────────── */
+.event-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+  position: relative;
+}
+.event-chip:last-child { margin-bottom: 0; }
+.event-type-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.event-chip-title {
+  font-size: 11px;
+  color: #111827;
+  font-weight: 500;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.event-chip-time {
+  font-size: 10px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.event-chip-owner {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.event-chip-delete {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+.event-chip:hover .event-chip-delete { opacity: 1; }
+.event-chip-delete:hover { color: var(--red); }
+
+/* ─── EVENT MODAL ────────────────────────────────── */
+.event-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+.event-modal-overlay.hidden { display: none; }
+.event-modal {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+}
+.event-modal-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+.event-modal-field {
+  margin-bottom: 14px;
+}
+.event-modal-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.event-modal-optional {
+  font-weight: 400;
+  text-transform: none;
+  font-size: 9px;
+  letter-spacing: 0;
+}
+.event-modal-input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  box-sizing: border-box;
+}
+.event-modal-input:focus { border-color: var(--primary); }
+.event-modal-row {
+  display: flex;
+  gap: 12px;
+}
+.event-modal-row .event-modal-field { flex: 1; }
+.event-type-picker,
+.event-owner-picker {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.event-type-btn,
+.event-owner-btn {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--card-inner);
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.event-type-btn.active {
+  background: var(--type-color, var(--primary));
+  color: #fff;
+  border-color: transparent;
+}
+.event-owner-btn.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: transparent;
+}
+.event-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 18px;
+}
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.btn-primary:hover { background: #015bb0; border-color: #015bb0; color: #fff; }
+
+/* ─── TODAY SCHEDULE ─────────────────────────────── */
+.schedule-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+.schedule-row-title {
+  font-size: 13px;
+  color: #111827;
+  font-weight: 500;
+  flex: 1;
+}
+.schedule-row-time {
+  font-size: 11px;
+  color: var(--muted);
+}
+.schedule-row-owner {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+}
