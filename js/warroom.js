@@ -151,10 +151,6 @@ function updateClearedPill(activeClients, allTasks) {
   if (pill) pill.textContent = `${clearedCount}/${activeClients.length} cleared`
 }
 
-function autoResize(el) {
-  el.style.height = 'auto'
-  el.style.height = el.scrollHeight + 'px'
-}
 
 function localDateStr(d) {
   return d.getFullYear() + '-' +
@@ -218,11 +214,13 @@ function dayCardHTML(day, events) {
 
 function eventChipHTML(event) {
   const color = EVENT_COLORS[event.type] || '#6B7280'
+  const safeTitle = escapeHtml(event.title)
+  const safeTime  = event.time  ? escapeHtml(event.time)  : null
   return `
     <div class="event-chip">
       <span class="event-type-badge" style="background:${color}">${event.type.toUpperCase()}</span>
-      <span class="event-chip-title">${event.title}</span>
-      ${event.time ? `<span class="event-chip-time">${event.time}</span>` : ''}
+      <span class="event-chip-title">${safeTitle}</span>
+      ${safeTime ? `<span class="event-chip-time">${safeTime}</span>` : ''}
       ${event.owner ? `<span class="event-chip-owner">${event.owner.toUpperCase()}</span>` : ''}
       <button class="event-chip-delete" data-id="${event.id}" title="Remove">×</button>
     </div>

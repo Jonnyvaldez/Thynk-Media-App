@@ -640,41 +640,6 @@ textarea.form-input { resize: vertical; min-height: 100px; }
 .file-delete { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 13px; padding: 4px 6px; flex-shrink: 0; border-radius: 4px; }
 .file-delete:hover { color: var(--red); background: var(--red-light); }
 
-/* ─── WEEK AHEAD (war room) ──────────────────────── */
-.week-day {
-  background: var(--card-inner);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 14px;
-  margin-bottom: 6px;
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-}
-.day-label {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: 700;
-  color: var(--muted);
-  width: 32px;
-  flex-shrink: 0;
-  padding-top: 2px;
-  line-height: 1.6;
-}
-.day-label.today { color: var(--red); }
-.day-input {
-  flex: 1;
-  background: none;
-  border: none;
-  color: var(--text);
-  font-family: var(--font-body);
-  font-size: 13px;
-  outline: none;
-  resize: none;
-  min-height: 20px;
-  line-height: 1.5;
-}
-
 /* ─── RULES BOX ──────────────────────────────────── */
 .rules-box {
   background: var(--red-light);
