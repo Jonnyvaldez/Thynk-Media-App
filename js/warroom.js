@@ -3,10 +3,13 @@
 async function renderWarRoom() {
   const content = document.getElementById('tab-content')
 
-  const [clients, allTasks, pipeline] = await Promise.all([
+  const days = getWeekDays()
+
+  const [clients, allTasks, pipeline, weekEvents] = await Promise.all([
     getClients(),
     getTasks(),
-    getPipeline()
+    getPipeline(),
+    getWeekEvents(days[0].key, days[6].key)
   ])
 
   const activeClients = clients.filter(c => c.status === 'active' || c.status === 'performance_phase')
@@ -18,10 +21,6 @@ async function renderWarRoom() {
   const blockedClients = new Set(urgentTasks.map(t => t.client_id)).size
   const top3 = urgentTasks.slice(0, 3)
 
-  const weekKey = 'warroom-week-' + getMondayDate()
-  const weekData = JSON.parse(localStorage.getItem(weekKey) || '{}')
-
-  const days = getWeekDays()
 
   content.innerHTML = `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
@@ -104,14 +103,7 @@ async function renderWarRoom() {
     <!-- Week Ahead -->
     <div class="section-label">The Week Ahead</div>
     <div id="week-ahead">
-      ${days.map(d => `
-        <div class="week-day">
-          <div class="day-label ${d.isToday ? 'today' : ''}">${d.short}<br><span style="font-weight:400">${d.date}</span></div>
-          <textarea class="day-input" data-day="${d.key}" rows="1"
-            placeholder="${d.isToday ? 'Today...' : ''}"
-            oninput="autoResize(this)">${weekData[d.key] || ''}</textarea>
-        </div>
-      `).join('')}
+      ${days.map(d => dayCardHTML(d, weekEvents.filter(e => e.date === d.key))).join('')}
     </div>
 
     <!-- Pipeline Pulse -->
@@ -147,16 +139,8 @@ async function renderWarRoom() {
     })
   })
 
-  // Week ahead save
-  content.querySelectorAll('.day-input').forEach(input => {
-    input.addEventListener('input', () => {
-      weekData[input.dataset.day] = input.value
-      localStorage.setItem(weekKey, JSON.stringify(weekData))
-    })
-    autoResize(input)
-  })
-
   updateClearedPill(activeClients, allTasks)
+  wireWeekAheadEvents()
 }
 
 function updateClearedPill(activeClients, allTasks) {
@@ -203,5 +187,186 @@ function getWeekDays() {
       key: dateStr,
       isToday: dateStr === todayStr
     }
+  })
+}
+
+// ─── CALENDAR EVENTS ─────────────────────────────
+
+const EVENT_COLORS = {
+  call: '#0176D3',
+  meeting: '#8B5CF6',
+  deadline: '#F59E0B',
+  launch: '#EF4444',
+  task: '#22C55E'
+}
+
+function dayCardHTML(day, events) {
+  return `
+    <div class="day-card ${day.isToday ? 'day-card-today' : ''}">
+      <div class="day-card-header">
+        <div>
+          <span class="day-card-name">${day.short}</span>
+          <span class="day-card-date">${day.date}</span>
+          ${day.isToday ? '<span class="day-card-today-pill">TODAY</span>' : ''}
+        </div>
+        <button class="day-card-add" data-day="${day.key}" data-label="${day.label}, ${day.date}">+</button>
+      </div>
+      ${events.map(e => eventChipHTML(e)).join('')}
+    </div>
+  `
+}
+
+function eventChipHTML(event) {
+  const color = EVENT_COLORS[event.type] || '#6B7280'
+  return `
+    <div class="event-chip">
+      <span class="event-type-badge" style="background:${color}">${event.type.toUpperCase()}</span>
+      <span class="event-chip-title">${event.title}</span>
+      ${event.time ? `<span class="event-chip-time">${event.time}</span>` : ''}
+      ${event.owner ? `<span class="event-chip-owner">${event.owner.toUpperCase()}</span>` : ''}
+      <button class="event-chip-delete" data-id="${event.id}" title="Remove">×</button>
+    </div>
+  `
+}
+
+let _modalDayKey = null
+
+function ensureEventModal() {
+  if (document.getElementById('event-modal-overlay')) return
+  const overlay = document.createElement('div')
+  overlay.id = 'event-modal-overlay'
+  overlay.className = 'event-modal-overlay hidden'
+  overlay.innerHTML = `
+    <div class="event-modal">
+      <div class="event-modal-title" id="event-modal-day-label"></div>
+      <div class="event-modal-field">
+        <label class="event-modal-label">Title</label>
+        <input id="event-modal-title-input" class="event-modal-input" type="text" placeholder="e.g. Aisha strategy call">
+      </div>
+      <div class="event-modal-field">
+        <label class="event-modal-label">Type</label>
+        <div class="event-type-picker">
+          <button class="event-type-btn" data-type="call" style="--type-color:#0176D3">CALL</button>
+          <button class="event-type-btn" data-type="meeting" style="--type-color:#8B5CF6">MEETING</button>
+          <button class="event-type-btn" data-type="deadline" style="--type-color:#F59E0B">DEADLINE</button>
+          <button class="event-type-btn" data-type="launch" style="--type-color:#EF4444">LAUNCH</button>
+          <button class="event-type-btn" data-type="task" style="--type-color:#22C55E">TASK</button>
+        </div>
+      </div>
+      <div class="event-modal-row">
+        <div class="event-modal-field">
+          <label class="event-modal-label">Time <span class="event-modal-optional">(optional)</span></label>
+          <input id="event-modal-time-input" class="event-modal-input" type="text" placeholder="e.g. 10am">
+        </div>
+        <div class="event-modal-field">
+          <label class="event-modal-label">Owner <span class="event-modal-optional">(optional)</span></label>
+          <div class="event-owner-picker">
+            <button class="event-owner-btn" data-owner="jonny">JONNY</button>
+            <button class="event-owner-btn" data-owner="alex">ALEX</button>
+            <button class="event-owner-btn" data-owner="both">BOTH</button>
+          </div>
+        </div>
+      </div>
+      <div class="event-modal-actions">
+        <button id="event-modal-cancel" class="btn">Cancel</button>
+        <button id="event-modal-save" class="btn btn-primary">Add Event</button>
+      </div>
+    </div>
+  `
+  document.body.appendChild(overlay)
+
+  overlay.querySelectorAll('.event-type-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      overlay.querySelectorAll('.event-type-btn').forEach(b => b.classList.remove('active'))
+      btn.classList.add('active')
+    })
+  })
+
+  overlay.querySelectorAll('.event-owner-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const wasActive = btn.classList.contains('active')
+      overlay.querySelectorAll('.event-owner-btn').forEach(b => b.classList.remove('active'))
+      if (!wasActive) btn.classList.add('active')
+    })
+  })
+
+  overlay.querySelector('#event-modal-cancel').addEventListener('click', closeEventModal)
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeEventModal() })
+
+  overlay.querySelector('#event-modal-save').addEventListener('click', saveEventFromModal)
+
+  overlay.querySelector('#event-modal-title-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') overlay.querySelector('#event-modal-save').click()
+  })
+}
+
+function openEventModal(dayKey, dayLabel) {
+  ensureEventModal()
+  _modalDayKey = dayKey
+  document.getElementById('event-modal-day-label').textContent = 'Add event — ' + dayLabel
+  document.getElementById('event-modal-title-input').value = ''
+  document.getElementById('event-modal-time-input').value = ''
+  document.querySelectorAll('.event-type-btn').forEach(b => b.classList.remove('active'))
+  document.querySelectorAll('.event-owner-btn').forEach(b => b.classList.remove('active'))
+  document.getElementById('event-modal-overlay').classList.remove('hidden')
+  document.getElementById('event-modal-title-input').focus()
+}
+
+function closeEventModal() {
+  const overlay = document.getElementById('event-modal-overlay')
+  if (overlay) overlay.classList.add('hidden')
+  _modalDayKey = null
+}
+
+async function saveEventFromModal() {
+  const title = document.getElementById('event-modal-title-input').value.trim()
+  if (!title) { document.getElementById('event-modal-title-input').focus(); return }
+
+  const activeType = document.querySelector('.event-type-btn.active')
+  if (!activeType) {
+    document.querySelector('.event-type-picker').style.outline = '1px solid var(--red)'
+    setTimeout(() => document.querySelector('.event-type-picker').style.outline = '', 1200)
+    return
+  }
+
+  const time  = document.getElementById('event-modal-time-input').value.trim() || null
+  const activeOwner = document.querySelector('.event-owner-btn.active')
+  const owner = activeOwner ? activeOwner.dataset.owner : null
+
+  const btn = document.getElementById('event-modal-save')
+  btn.disabled = true
+  btn.textContent = 'Saving...'
+
+  try {
+    await addEvent({ date: _modalDayKey, title, type: activeType.dataset.type, time, owner })
+    closeEventModal()
+    await refreshWeekAhead()
+  } catch (err) {
+    console.error('Failed to save event:', err)
+  } finally {
+    btn.disabled = false
+    btn.textContent = 'Add Event'
+  }
+}
+
+async function refreshWeekAhead() {
+  const days = getWeekDays()
+  const weekEvents = await getWeekEvents(days[0].key, days[6].key)
+  const container = document.getElementById('week-ahead')
+  if (!container) return
+  container.innerHTML = days.map(d => dayCardHTML(d, weekEvents.filter(e => e.date === d.key))).join('')
+  wireWeekAheadEvents()
+}
+
+function wireWeekAheadEvents() {
+  document.querySelectorAll('.day-card-add').forEach(btn => {
+    btn.addEventListener('click', () => openEventModal(btn.dataset.day, btn.dataset.label))
+  })
+  document.querySelectorAll('.event-chip-delete').forEach(btn => {
+    btn.addEventListener('click', async e => {
+      e.stopPropagation()
+      await deleteEvent(btn.dataset.id)
+      await refreshWeekAhead()
+    })
   })
 }
