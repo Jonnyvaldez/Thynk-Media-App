@@ -94,7 +94,8 @@ async function addLink(clientId, label, url) {
 }
 
 async function uploadFile(clientId, file) {
-  const path = `${clientId}/${Date.now()}-${file.name}`
+  const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_')
+  const path = `${clientId}/${Date.now()}-${safeName}`
   const { error: uploadError } = await db.storage.from('client-files').upload(path, file)
   if (uploadError) throw uploadError
   const { data: { publicUrl } } = db.storage.from('client-files').getPublicUrl(path)
