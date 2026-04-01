@@ -168,3 +168,32 @@ async function getMRR() {
   const clients = await getClients('active')
   return clients.reduce((sum, c) => sum + (c.monthly_value || 0), 0)
 }
+
+// CLIENT PORTAL
+async function getClientUserProfile() {
+  const { data: { user } } = await db.auth.getUser()
+  if (!user) return null
+  const { data, error } = await db
+    .from('client_users').select('client_id')
+    .eq('auth_user_id', user.id).maybeSingle()
+  if (error) throw error
+  return data  // null = agency user, { client_id } = client
+}
+
+async function getClientPortalData(clientId) {
+  const [clientRes, tasksRes, filesRes, noteRes, paymentsRes] = await Promise.all([
+    db.from('clients').select('*').eq('id', clientId).single(),
+    db.from('tasks').select('*').eq('client_id', clientId).eq('is_done', false).order('created_at'),
+    db.from('files').select('*').eq('client_id', clientId).order('created_at', { ascending: false }),
+    db.from('notes').select('*').eq('client_id', clientId).maybeSingle(),
+    db.from('payments').select('*').eq('client_id', clientId).eq('status', 'pending').order('due_date').limit(1)
+  ])
+  if (clientRes.error) throw clientRes.error
+  return {
+    client:  clientRes.data,
+    tasks:   tasksRes.data  || [],
+    files:   filesRes.data  || [],
+    note:    noteRes.data,
+    payment: paymentsRes.data?.[0] || null
+  }
+}

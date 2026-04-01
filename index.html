@@ -103,6 +103,15 @@
     </div><!-- .main-wrapper -->
   </div><!-- #app -->
 
+  <!-- Client portal (hidden until client logs in) -->
+  <div id="client-portal" class="hidden">
+    <header class="topbar">
+      <span class="topbar-brand">THYNK MEDIA</span>
+      <button id="portal-logout-btn" class="logout-btn">Sign out</button>
+    </header>
+    <main id="portal-content" style="padding:18px 16px 40px;max-width:680px;margin:0 auto"></main>
+  </div>
+
   <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- App scripts (order matters) -->
@@ -113,6 +122,7 @@
   <script src="js/clients.js"></script>
   <script src="js/pipeline.js"></script>
   <script src="js/warroom.js"></script>
+  <script src="js/client-portal.js"></script>
   <script src="js/router.js"></script>
 </body>
 </html>

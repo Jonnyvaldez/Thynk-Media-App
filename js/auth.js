@@ -1,4 +1,4 @@
-// auth.js — login, logout, session check
+// auth.js — login, logout, session check, portal routing
 
 async function signIn(email, password) {
   const { data, error } = await db.auth.signInWithPassword({ email, password })
@@ -6,30 +6,53 @@ async function signIn(email, password) {
   return data
 }
 
-async function signOut() {
-  await db.auth.signOut()
-}
+async function signOut() { await db.auth.signOut() }
 
 async function getSession() {
   const { data } = await db.auth.getSession()
   return data.session
 }
 
-// Wire up login form
+async function determineAndShowUI() {
+  const profile = await getClientUserProfile()
+  if (profile) { showClientPortal(profile.client_id) } else { showAgencyHub() }
+}
+
+function showAgencyHub() {
+  document.getElementById('login-screen').classList.add('hidden')
+  document.getElementById('client-portal').classList.add('hidden')
+  document.getElementById('app').classList.remove('hidden')
+  if (!location.hash || location.hash === '#') location.hash = '#today'
+  else window.dispatchEvent(new HashChangeEvent('hashchange'))
+}
+
+function showClientPortal(clientId) {
+  document.getElementById('login-screen').classList.add('hidden')
+  document.getElementById('app').classList.add('hidden')
+  document.getElementById('client-portal').classList.remove('hidden')
+  renderClientPortal(clientId)
+}
+
+function showLogin() {
+  document.getElementById('app').classList.add('hidden')
+  document.getElementById('client-portal').classList.add('hidden')
+  document.getElementById('login-screen').classList.remove('hidden')
+  location.hash = ''
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-  const loginBtn = document.getElementById('login-btn')
+  const loginBtn   = document.getElementById('login-btn')
   const loginError = document.getElementById('login-error')
 
   loginBtn.addEventListener('click', async () => {
-    const email = document.getElementById('login-email').value.trim()
+    const email    = document.getElementById('login-email').value.trim()
     const password = document.getElementById('login-password').value
     loginBtn.textContent = 'Signing in...'
     loginBtn.disabled = true
     loginError.classList.add('hidden')
-
     try {
       await signIn(email, password)
-      showApp()
+      await determineAndShowUI()
     } catch (err) {
       loginError.textContent = 'Invalid email or password'
       loginError.classList.remove('hidden')
@@ -44,30 +67,18 @@ document.addEventListener('DOMContentLoaded', () => {
   })
 
   document.getElementById('logout-btn').addEventListener('click', async () => {
-    await signOut()
-    showLogin()
+    await signOut(); showLogin()
+  })
+  document.getElementById('logout-btn-sidebar').addEventListener('click', async () => {
+    await signOut(); showLogin()
+  })
+  document.getElementById('portal-logout-btn').addEventListener('click', async () => {
+    await signOut(); showLogin()
   })
 })
 
-function showApp() {
-  document.getElementById('login-screen').classList.add('hidden')
-  document.getElementById('app').classList.remove('hidden')
-  window.dispatchEvent(new HashChangeEvent('hashchange'))
-  if (!location.hash || location.hash === '#') location.hash = '#today'
-}
-
-function showLogin() {
-  document.getElementById('app').classList.add('hidden')
-  document.getElementById('login-screen').classList.remove('hidden')
-  location.hash = ''
-}
-
-// On page load: check if already logged in
 window.addEventListener('load', async () => {
   const session = await getSession()
-  if (session) {
-    showApp()
-  } else {
-    document.getElementById('login-screen').classList.remove('hidden')
-  }
+  if (session) { await determineAndShowUI() }
+  else { document.getElementById('login-screen').classList.remove('hidden') }
 })
