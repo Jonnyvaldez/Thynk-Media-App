@@ -169,6 +169,35 @@ async function getMRR() {
   return clients.reduce((sum, c) => sum + (c.monthly_value || 0), 0)
 }
 
+// EVENTS
+async function getEvents(dateStr) {
+  const { data, error } = await db
+    .from('events').select('*').eq('date', dateStr).order('created_at')
+  if (error) throw error
+  return data || []
+}
+
+async function getWeekEvents(mondayStr, sundayStr) {
+  const { data, error } = await db
+    .from('events').select('*')
+    .gte('date', mondayStr)
+    .lte('date', sundayStr)
+    .order('date')
+    .order('created_at')
+  if (error) throw error
+  return data || []
+}
+
+async function addEvent(payload) {
+  const { error } = await db.from('events').insert(payload)
+  if (error) throw error
+}
+
+async function deleteEvent(id) {
+  const { error } = await db.from('events').delete().eq('id', id)
+  if (error) throw error
+}
+
 // CLIENT PORTAL
 async function getClientUserProfile() {
   const { data: { user } } = await db.auth.getUser()
