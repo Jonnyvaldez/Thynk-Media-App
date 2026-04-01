@@ -270,9 +270,13 @@ async function renderTasks(clientId, container) {
   })
 
   // Save new task
-  document.getElementById('save-task-btn').addEventListener('click', async () => {
+  document.getElementById('save-task-btn').addEventListener('click', async (e) => {
+    const btn = e.currentTarget
+    if (btn.disabled) return
     const title = document.getElementById('new-task-title').value.trim()
     if (!title) return
+    btn.disabled = true
+    btn.textContent = 'Saving...'
     const owner = document.getElementById('new-task-owner').value
     const dueDate = document.getElementById('new-task-due').value
     const isUrgent = document.getElementById('new-task-urgent').checked
