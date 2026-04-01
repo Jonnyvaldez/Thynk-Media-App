@@ -110,13 +110,13 @@ function formatDate(dateStr) {
 }
 
 function scheduleRowHTML(event) {
-  const color = { call:'#0176D3', meeting:'#8B5CF6', deadline:'#F59E0B', launch:'#EF4444', task:'#22C55E' }[event.type] || '#6B7280'
+  const color = EVENT_COLORS[event.type] || '#6B7280'
   return `
     <div class="schedule-row">
       <span class="event-type-badge" style="background:${color}">${event.type.toUpperCase()}</span>
       <span class="schedule-row-title">${escapeHtml(event.title)}</span>
       ${event.time ? `<span class="schedule-row-time">${escapeHtml(event.time)}</span>` : ''}
-      ${event.owner ? `<span class="schedule-row-owner">${event.owner.toUpperCase()}</span>` : ''}
+      ${event.owner ? `<span class="schedule-row-owner">${escapeHtml(event.owner).toUpperCase()}</span>` : ''}
     </div>
   `
 }

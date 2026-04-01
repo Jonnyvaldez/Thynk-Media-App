@@ -226,3 +226,9 @@ async function getClientPortalData(clientId) {
     payment: paymentsRes.data?.[0] || null
   }
 }
+
+// UTILITIES
+function escapeHtml(str) {
+  if (!str) return ''
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+}

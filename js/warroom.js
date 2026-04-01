@@ -221,7 +221,7 @@ function eventChipHTML(event) {
       <span class="event-type-badge" style="background:${color}">${event.type.toUpperCase()}</span>
       <span class="event-chip-title">${safeTitle}</span>
       ${safeTime ? `<span class="event-chip-time">${safeTime}</span>` : ''}
-      ${event.owner ? `<span class="event-chip-owner">${event.owner.toUpperCase()}</span>` : ''}
+      ${event.owner ? `<span class="event-chip-owner">${escapeHtml(event.owner).toUpperCase()}</span>` : ''}
       <button class="event-chip-delete" data-id="${event.id}" title="Remove">×</button>
     </div>
   `
