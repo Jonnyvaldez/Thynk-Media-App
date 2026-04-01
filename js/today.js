@@ -3,11 +3,14 @@
 async function renderToday() {
   const content = document.getElementById('tab-content')
 
-  const [urgentTasks, weekTasks, payments, clients] = await Promise.all([
+  const todayStr = localDateStr(new Date())
+
+  const [urgentTasks, weekTasks, payments, clients, todayEvents] = await Promise.all([
     getUrgentTasks(),
     getThisWeekTasks(),
     getPaymentsDue(),
-    getClients()
+    getClients(),
+    getEvents(todayStr)
   ])
 
   const mrr = clients.filter(c => c.status === 'active').reduce((s, c) => s + (c.monthly_value || 0), 0)
@@ -23,6 +26,11 @@ async function renderToday() {
       </div>
       <div style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--green);background:rgba(39,152,90,0.1);border:1px solid rgba(39,152,90,0.2);border-radius:6px;padding:5px 10px">$${mrr.toLocaleString()}/mo</div>
     </div>
+
+    ${todayEvents.length > 0 ? `
+    <div class="section-label">Today's Schedule</div>
+    ${todayEvents.map(e => scheduleRowHTML(e)).join('')}
+    ` : ''}
 
     ${urgentTasks.length > 0 ? `
     <div class="section-label">Urgent</div>
@@ -99,4 +107,16 @@ function formatDate(dateStr) {
   if (!dateStr) return ''
   const d = new Date(dateStr + 'T00:00:00')
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
+function scheduleRowHTML(event) {
+  const color = { call:'#0176D3', meeting:'#8B5CF6', deadline:'#F59E0B', launch:'#EF4444', task:'#22C55E' }[event.type] || '#6B7280'
+  return `
+    <div class="schedule-row">
+      <span class="event-type-badge" style="background:${color}">${event.type.toUpperCase()}</span>
+      <span class="schedule-row-title">${escapeHtml(event.title)}</span>
+      ${event.time ? `<span class="schedule-row-time">${escapeHtml(event.time)}</span>` : ''}
+      ${event.owner ? `<span class="schedule-row-owner">${event.owner.toUpperCase()}</span>` : ''}
+    </div>
+  `
 }
