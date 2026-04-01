@@ -810,7 +810,7 @@ textarea.form-input { resize: vertical; min-height: 100px; }
 }
 .event-chip-title {
   font-size: 11px;
-  color: #111827;
+  color: var(--text);
   font-weight: 500;
   flex: 1;
   min-width: 0;
@@ -942,12 +942,6 @@ textarea.form-input { resize: vertical; min-height: 100px; }
   gap: 8px;
   margin-top: 18px;
 }
-.btn-primary {
-  background: var(--primary);
-  color: #fff;
-  border-color: var(--primary);
-}
-.btn-primary:hover { background: #015bb0; border-color: #015bb0; color: #fff; }
 
 /* ─── TODAY SCHEDULE ─────────────────────────────── */
 .schedule-row {
@@ -957,12 +951,12 @@ textarea.form-input { resize: vertical; min-height: 100px; }
   padding: 8px 12px;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius);
   margin-bottom: 6px;
 }
 .schedule-row-title {
   font-size: 13px;
-  color: #111827;
+  color: var(--text);
   font-weight: 500;
   flex: 1;
 }
